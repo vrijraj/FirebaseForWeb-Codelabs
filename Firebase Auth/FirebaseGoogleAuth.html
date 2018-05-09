@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Firebase Google Auth</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    
+</head>
+<body>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mt-5 pt-5">
+                    <center>
+                    <h1 class="h1-responsive">Firebase Google Auth</h1>
+                    <button id="GoogleLogin" class="btn btn-primary mt-5">Sign in with Google</button>
+                    <button id="GoogleLogout" class="btn btn-danger mt-5">Logout</button>
+                    <br>
+                    </center>
+                    <div id="data"></div>
+               
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="https://www.gstatic.com/firebasejs/5.0.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyCQRKIGXISgUeuqoGaC_BuilT4eme1vAYE",
+            authDomain: "vrij-web.firebaseapp.com",
+            databaseURL: "https://vrij-web.firebaseio.com",
+            projectId: "vrij-web",
+            storageBucket: "vrij-web.appspot.com",
+            messagingSenderId: "355936195315"
+        };
+
+        firebase.initializeApp(config);
+        
+
+        var LogoutButton = document.getElementById('GoogleLogout');
+        var LoginButton= document.getElementById('GoogleLogin');
+
+        // Hide the Logout Button By Default
+        LogoutButton.style.display="none";
+
+        // Initializing Firebase GoogleAuth Provider 
+        var provider = new firebase.auth.GoogleAuthProvider();
+
+        // Call Action on the Button
+        LoginButton.addEventListener('click',LoginUser);
+        LogoutButton.addEventListener('click',LogoutUser);
+
+        // Call Functions for Login User
+        function LoginUser(){
+            // Google Sign In with POP UP
+            firebase.auth().signInWithPopup(provider).then(function(result) {
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                var token = result.credential.accessToken;
+                // The signed-in user info.
+                var user = result.user;
+            }).catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // The email of the user's account used.
+                var email = error.email;
+                // The firebase.auth.AuthCredential type that was used.
+                var credential = error.credential;
+            });
+        }
+
+        // For each of your app's pages that need information about the signed-in user, attach an observer to the global authentication object. This observer gets called whenever the user's sign-in state changes.
+
+        //Attach the observer using the onAuthStateChanged method. When a user successfully signs in, you can get information about the user in the observer.
+
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                // Show Logout Button
+                LogoutButton.style.display="block";
+                
+                // Hide Login Button
+                LoginButton.style.display="none";
+
+                // User is signed in.
+                var displayName = user.displayName;
+                var email = user.email;
+                var emailVerified = user.emailVerified;
+                var photoURL = user.photoURL;
+                var isAnonymous = user.isAnonymous;
+                var uid = user.uid;
+                var providerData = user.providerData;
+
+                console.log(email);
+                
+                // Showing All user Info at Div section with id DATA
+                document.getElementById('data').innerHTML=`
+                <div class='container'>
+                    <h1>User Details</h1>
+                    <hr>
+                    <div class='row'>
+                        <div class='col-md-3'>
+                            <img src=' `+photoURL+`' class='img-fluid'>
+                        </div>
+                        <div class='col-md-9'>
+                            <h5>Name: `+displayName+`</h5>
+                            <h5>Email: `+email+`</h5>
+                            <h5>UID: `+uid+`</h5>
+                            <h5>Email Verified: `+emailVerified+`</h5>
+                        </div>
+                    </div>
+                </div>
+                `;
+                    
+                
+            } else {
+                // User is signed out.
+                // ...
+                document.getElementById('data').innerHTML=` `;
+            }
+        });
+
+        function LogoutUser(){
+            firebase.auth().signOut().then(function() {
+                // Sign-out successful.
+                alert('User Logged Out Successfully');
+                document.getElementById('data').innerHTML=` `;
+
+                // Hide Logout Button
+                LogoutButton.style.display="none";
+                
+                // Show Login Button
+                LoginButton.style.display="block";
+
+            }).catch(function(error) {
+                // An error happened.
+            });
+        }
+
+    </script>
+
+<!-- 
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script> -->
+
+</body>
+</html>
